@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:todo_app/data/local/providers/task_provider.dart';
+import 'package:todo_app/models/task.dart';
 
 class TodoForm extends StatefulWidget {
-  const TodoForm({Key? key}) : super(key: key);
+  const TodoForm({Key? key, required this.onSaved}) : super(key: key);
+
+  final Function onSaved;
 
   @override
   State<TodoForm> createState() => _TodoFormState();
@@ -10,6 +14,7 @@ class TodoForm extends StatefulWidget {
 
 class _TodoFormState extends State<TodoForm> {
   final _formKey = GlobalKey<FormBuilderState>();
+  final taskProvider = TaskProvider();
   bool _saving = false;
 
   @override
@@ -35,7 +40,7 @@ class _TodoFormState extends State<TodoForm> {
             child: Column(
               children: [
                 FormBuilderTextField(
-                  name: 'todo',
+                  name: 'task',
                   decoration: const InputDecoration(
                     labelText: 'Tarea',
                   ),
@@ -59,17 +64,34 @@ class _TodoFormState extends State<TodoForm> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         IconButton(
-          onPressed: () {
+          onPressed: () async {
             setState(() {
               _saving = true;
             });
             _formKey.currentState!.save();
 
             final data = _formKey.currentState!.value;
-            Future.delayed(const Duration(milliseconds: 1500), () {
-              print('New tas $data');
-              Navigator.of(context).pop();
-            });
+
+            final task = await taskProvider.insert(Task(
+              status: false,
+              task: data['task'],
+            ));
+
+            if (!mounted) return;
+
+            if (task.id != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Guardamos correctamente')),
+              );
+              widget.onSaved();
+            } else {
+              setState(() {
+                _saving = false;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('No se pudo crear la tarea')),
+              );
+            }
           },
           icon: const Icon(Icons.save),
         ),

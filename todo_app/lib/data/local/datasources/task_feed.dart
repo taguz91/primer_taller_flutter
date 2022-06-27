@@ -9,7 +9,7 @@ class TaskFeed {
 
   static const String sqlCreateTable = '''
   CREATE TABLE $tableName (
-    $columnId INTEGER NOT NULL,
+    $columnId INTEGER PRIMARY KEY,
     $columnTask TEXT NOT NULL,
     $columnStatus INTEGER NOT NULL DEFAULT FALSE
   )''';
