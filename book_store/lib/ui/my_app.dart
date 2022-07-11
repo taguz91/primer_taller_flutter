@@ -1,3 +1,4 @@
+import 'package:book_store/constants/colors.dart';
 import 'package:book_store/utils/routes.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Book store',
-      theme: ThemeData(),
+      theme: ThemeData(
+        useMaterial3: true,
+        primaryColor: AppColors.primary,
+      ),
       initialRoute: Routes.home,
       routes: Routes.routes,
     );
